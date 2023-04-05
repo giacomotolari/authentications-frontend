@@ -4,6 +4,7 @@ import { darkTheme } from "./theme/themes";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import Navbar from "./components/Navbar";
 
+
 export default function RootLayout({
   children,
 }: {

@@ -1,36 +1,43 @@
 import { create } from "zustand";
 import { User } from "../types/users";
+import axios from "axios";
+import { persist, createJSONStorage } from "zustand/middleware";
 
-interface UserStore {
-  users: User[];
-  loggedUser?: User;
-  addUser: (user: User) => void;
-  updateUser: (updatedUser: User) => void;
-  deleteUser: (id: string) => void;
-  //   getUserById: (id: string) => User | undefined | void;
+export interface UserStore {
+  user?: User;
+  loading: boolean;
+  update: (updatedUser: User) => void;
+  register: (user: User) => Promise<void>;
 }
 
-export const usersStore = create<UserStore>((set) => ({
-  users: [],
-  loggedUser: undefined,
+export const userStore = create<UserStore>()(
+  persist(
+    (set, get) => ({
+      user: undefined,
+      loading: false,
 
-  addUser: (user) => set((state) => ({ users: [...state.users, user] })),
+      update: (updatedUser) => {
+        set((state) => ({
+          user: updatedUser,
+        }));
+      },
 
-  updateUser: (updatedUser) => {
-    set((state) => ({
-      users: state.users.map((user) =>
-        user.id === updatedUser.id ? updatedUser : user
-      ),
-    }));
-  },
+      register: async (user: User) => {
+        set((state) => ({
+          loading: true,
+        }));
+        const response = await axios.post("/api/users", user);
+        set((state) => ({
+          user: response.data,
+          loading: false,
+        }));
+      },
+    }),
 
-  deleteUser: (id) => {
-    set((state) => ({ users: state.users.filter((user) => user.id !== id) }));
-  },
-
-  //   getUserById: (id) => {
-  //     set((state) => ({
-  //       loggedUser: state.users.find((user) => user.id === id),
-  //     }));
-  //   },
-}));
+    {
+      name: "user", // name of item in the storage (must be unique)
+      storage: createJSONStorage(() => sessionStorage), // (optional) by default the 'localStorage' is used
+      partialize: (state) => ({ user: state.user }),
+    }
+  )
+);

@@ -1,71 +1,36 @@
-import React, { useState, MouseEvent } from "react";
-import { styled, alpha } from "@mui/material/styles";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import Home from "@mui/icons-material/Home";
+import LoginIcon from "@mui/icons-material/Login";
+import LogoutIcon from "@mui/icons-material/Logout";
+import MenuIcon from "@mui/icons-material/Menu";
+import MoreIcon from "@mui/icons-material/MoreVert";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import InputBase from "@mui/material/InputBase";
-import Badge from "@mui/material/Badge";
-import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import MailIcon from "@mui/icons-material/Mail";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import MoreIcon from "@mui/icons-material/MoreVert";
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
-    width: "auto",
-  },
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
-  },
-}));
+import MenuItem from "@mui/material/MenuItem";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { MouseEvent, useState } from "react";
+import { userStore } from "../global/userStore";
 
 export default function NavBar() {
+  const user = userStore((state) => state.user);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorNavigationEl, setAnchornavigationEl] = useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     useState<null | HTMLElement>(null);
 
   const isMenuOpen = Boolean(anchorEl);
+  const isNavigationMenuOpen = Boolean(anchorNavigationEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const handleProfileMenuOpen = (event: MouseEvent<HTMLElement>) => {
+  const handleUserMenuOpen = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handleNavigationMenuOpen = (event: MouseEvent<HTMLElement>) => {
+    setAnchornavigationEl(event.currentTarget);
   };
 
   const handleMobileMenuClose = () => {
@@ -77,11 +42,47 @@ export default function NavBar() {
     handleMobileMenuClose();
   };
 
+  const handleNavigationMenuClose = () => {
+    setAnchornavigationEl(null);
+    handleMobileMenuClose();
+  };
+
   const handleMobileMenuOpen = (event: MouseEvent<HTMLElement>) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
-
   const menuId = "primary-search-account-menu";
+
+  const navigationMenu = (
+    <Menu
+      anchorEl={anchorNavigationEl}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      open={isNavigationMenuOpen}
+      onClose={handleNavigationMenuClose}
+    >
+      <MenuItem onClick={handleMenuClose}>
+        <IconButton
+          size="large"
+          aria-label="home-page"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <Home />
+        </IconButton>
+        Home
+      </MenuItem>
+    </Menu>
+  );
+
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -98,8 +99,45 @@ export default function NavBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>
+        <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <AccountCircle />
+        </IconButton>
+        Home
+      </MenuItem>
+      {user ? (
+        <MenuItem onClick={handleMenuClose}>
+          <IconButton
+            size="large"
+            aria-label="logout of current user"
+            aria-controls="primary-search-account-menu"
+            aria-haspopup="true"
+            color="inherit"
+          >
+            <LogoutIcon />
+          </IconButton>
+          <p>Logout</p>
+        </MenuItem>
+      ) : (
+        <MenuItem onClick={handleMenuClose}>
+          <IconButton
+            size="large"
+            aria-label="login of current user"
+            aria-controls="primary-search-account-menu"
+            aria-haspopup="true"
+            color="inherit"
+          >
+            <LoginIcon />
+          </IconButton>
+          <p>Login</p>
+        </MenuItem>
+      )}
     </Menu>
   );
 
@@ -120,27 +158,7 @@ export default function NavBar() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
+      <MenuItem onClick={handleUserMenuOpen}>
         <IconButton
           size="large"
           aria-label="account of current user"
@@ -150,8 +168,35 @@ export default function NavBar() {
         >
           <AccountCircle />
         </IconButton>
-        <p>Profile</p>
+        <p>User</p>
       </MenuItem>
+      {user ? (
+        <MenuItem onClick={handleUserMenuOpen}>
+          <IconButton
+            size="large"
+            aria-label="logout of current user"
+            aria-controls="primary-search-account-menu"
+            aria-haspopup="true"
+            color="inherit"
+          >
+            <LogoutIcon />
+          </IconButton>
+          <p>Logout</p>
+        </MenuItem>
+      ) : (
+        <MenuItem onClick={handleUserMenuOpen}>
+          <IconButton
+            size="large"
+            aria-label="login of current user"
+            aria-controls="primary-search-account-menu"
+            aria-haspopup="true"
+            color="inherit"
+          >
+            <LoginIcon />
+          </IconButton>
+          <p>Login</p>
+        </MenuItem>
+      )}
     </Menu>
   );
 
@@ -165,53 +210,30 @@ export default function NavBar() {
             color="inherit"
             aria-label="open drawer"
             sx={{ mr: 2 }}
+            onClick={handleNavigationMenuOpen}
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { xs: "none", sm: "block" } }}
-          >
-            MUI
-          </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
+          {user && (
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
+              {user.firstName}
+            </Typography>
+          )}
+
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
-              size="large"
-              aria-label="show 4 new mails"
-              color="inherit"
-            >
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-            >
-              <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
             <IconButton
               size="large"
               edge="end"
               aria-label="account of current user"
               aria-controls={menuId}
               aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
+              onClick={handleUserMenuOpen}
               color="inherit"
             >
               <AccountCircle />
@@ -233,6 +255,7 @@ export default function NavBar() {
       </AppBar>
       {renderMobileMenu}
       {renderMenu}
+      {navigationMenu}
     </Box>
   );
 }
