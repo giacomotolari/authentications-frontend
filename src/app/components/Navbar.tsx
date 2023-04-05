@@ -50,7 +50,7 @@ export default function NavBar() {
   const handleMobileMenuOpen = (event: MouseEvent<HTMLElement>) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
-  const menuId = "primary-search-account-menu";
+  const navigationMenuId = "primary-search-account-navigation-menu";
 
   const navigationMenu = (
     <Menu
@@ -59,7 +59,7 @@ export default function NavBar() {
         vertical: "top",
         horizontal: "right",
       }}
-      id={menuId}
+      id={navigationMenuId}
       keepMounted
       transformOrigin={{
         vertical: "top",
@@ -82,6 +82,9 @@ export default function NavBar() {
       </MenuItem>
     </Menu>
   );
+
+  const menuId = "primary-search-account-menu-";
+
 
   const renderMenu = (
     <Menu
