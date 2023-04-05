@@ -14,47 +14,31 @@ import Typography from "@mui/material/Typography";
 import { MouseEvent, useState } from "react";
 import { userStore } from "../global/userStore";
 
-export default function NavBar() {
-  const user = userStore((state) => state.user);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [anchorNavigationEl, setAnchornavigationEl] = useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    useState<null | HTMLElement>(null);
+interface NavigationMenuProps {
+  anchorEl: null | HTMLElement;
+  handleMenuClose: () => void;
+  setAnchorNavigationMenuEl: (value: null | HTMLElement) => void;
+  handleMobileMenuClose: () => void;
+}
 
-  const isMenuOpen = Boolean(anchorEl);
-  const isNavigationMenuOpen = Boolean(anchorNavigationEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
-  const handleUserMenuOpen = (event: MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleNavigationMenuOpen = (event: MouseEvent<HTMLElement>) => {
-    setAnchornavigationEl(event.currentTarget);
-  };
-
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleNavigationMenuClose = () => {
-    setAnchornavigationEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event: MouseEvent<HTMLElement>) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
+function NavigationMenu({
+  anchorEl,
+  handleMenuClose,
+  setAnchorNavigationMenuEl,
+  handleMobileMenuClose,
+}: NavigationMenuProps) {
   const navigationMenuId = "primary-search-account-navigation-menu";
 
-  const navigationMenu = (
+  const handleNavigationMenuClose = () => {
+    setAnchorNavigationMenuEl(null);
+    handleMobileMenuClose();
+  };
+
+  const isNavigationMenuOpen = Boolean(anchorEl);
+
+  return (
     <Menu
-      anchorEl={anchorNavigationEl}
+      anchorEl={anchorEl}
       anchorOrigin={{
         vertical: "top",
         horizontal: "right",
@@ -82,9 +66,41 @@ export default function NavBar() {
       </MenuItem>
     </Menu>
   );
+}
+
+export default function NavBar() {
+  const user = userStore((state) => state.user);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorNavigationEl, setAnchornavigationEl] =
+    useState<null | HTMLElement>(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
+    useState<null | HTMLElement>(null);
+
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const handleUserMenuOpen = (event: MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleNavigationMenuOpen = (event: MouseEvent<HTMLElement>) => {
+    setAnchornavigationEl(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
+
+  const handleMobileMenuOpen = (event: MouseEvent<HTMLElement>) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
 
   const menuId = "primary-search-account-menu-";
-
 
   const renderMenu = (
     <Menu
@@ -258,7 +274,12 @@ export default function NavBar() {
       </AppBar>
       {renderMobileMenu}
       {renderMenu}
-      {navigationMenu}
+      <NavigationMenu
+        anchorEl={anchorNavigationEl}
+        handleMenuClose={handleMenuClose}
+        setAnchorNavigationMenuEl={setAnchornavigationEl}
+        handleMobileMenuClose={handleMobileMenuClose}
+      />
     </Box>
   );
 }
